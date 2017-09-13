@@ -6,6 +6,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './app.component';
 import { WorldComponent } from './world.component';
 import { HomeComponent } from './home.component';
+import { KeyboardComponent } from './keyboard.component';
 
 const appRoutes: Routes = [
   { path: 'world1', component: WorldComponent },
@@ -16,7 +17,8 @@ const appRoutes: Routes = [
   declarations: [
     AppComponent,
     WorldComponent,
-    HomeComponent
+    HomeComponent,
+    KeyboardComponent
   ],
   imports: [
     BrowserModule,
