@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { WorldComponent } from './world.component';
 import { HomeComponent } from './home.component';
 import { KeyboardComponent } from './keyboard.component';
+import { SynthService } from './synth.service';
 
 const appRoutes: Routes = [
   { path: 'world1', component: WorldComponent },
@@ -28,7 +29,10 @@ const appRoutes: Routes = [
       { enableTracing: true } // debug only
     )
   ],
-  providers: [],
+  providers: [
+    { provide: Window, useValue: window },
+    SynthService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

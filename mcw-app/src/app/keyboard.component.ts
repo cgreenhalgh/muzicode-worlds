@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
+import { SynthService } from './synth.service';
 
 @Component({
   selector: 'keyboard',
@@ -7,7 +8,10 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 })
 export class KeyboardComponent implements OnInit {
   @ViewChild('keyboardCanvas') canvasRef: ElementRef;
+  constructor(private synth: SynthService) {
+  }
   ngOnInit() {
+    //this.synth.noteOn(1000,100);
     let ctx: CanvasRenderingContext2D =
       this.canvasRef.nativeElement.getContext('2d');
     ctx.beginPath();
