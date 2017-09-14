@@ -141,15 +141,16 @@ export class KeyboardComponent implements OnInit, OnDestroy {
       if (possibleKey)
         possibleKey.pressed = true;
     }
+    let now = (new Date()).getTime()*0.001;
     for (let key of this.keys) {
       if (key.pressed && !key.active) {
         //console.log('press '+key.midinote);
-        this.note.emit(new Note(key.midinote, 127));
+        this.note.emit(new Note(key.midinote, 127, now));
         key.active = true;
         this.synth.noteOn(midi2freq(key.midinote), 127);
       } else if (!key.pressed && key.active) {
         //console.log('release '+key.midinote);
-        this.note.emit(new Note(key.midinote, 0));
+        this.note.emit(new Note(key.midinote, 0, now));
         key.active = false;
         this.synth.noteOff(midi2freq(key.midinote));
       }

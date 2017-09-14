@@ -19,12 +19,14 @@ export class Note {
   public midinote:number;
   public velocity:number; // 0-127
   public off:boolean;
-  constructor(midinote:number, velocity:number) {
+  public time:number; // unix time seconds
+  constructor(midinote:number, velocity:number, time:number) {
     this.velocity = velocity;
     this.off = velocity<=0;
     this.midinote = midinote;
     //this.freq = midi2freq(midinote);
     this.note = midi2name(midinote);
+    this.time = time;
   }
 }
 
