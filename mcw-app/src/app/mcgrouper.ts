@@ -5,6 +5,7 @@ import { ProjectionParameters, FilterParameters } from './mcparameters';
 
 export class NoteGroup {
   public notes:Note[] = [];
+  public midinotesOn:number[] = [];
   public closed:boolean = false;
   public lastTime:number;
 }
@@ -27,9 +28,10 @@ export class NoteGrouper {
     this.closeGroups(note.time);
     if (note.off) {
       if (this.projectionParameters.filterParameters.useNoteOff && this.currentGroup) {
-        for (let n of this.currentGroup.notes) {
-          if (n.midinote == note.midinote)
-            this.currentGroup.lastTime = note.time;
+        let ix = this.currentGroup.midinotesOn.indexOf(note.midinote);
+        if (ix>=0) {
+          this.currentGroup.lastTime = note.time;
+          this.currentGroup.midinotesOn.splice(ix,1);
         }
       }
       return null;
@@ -37,12 +39,15 @@ export class NoteGrouper {
     if (!this.currentGroup) {
       this.currentGroup= new NoteGroup();
     }
-    this.currentGroup.notes.push(note); 
+    this.currentGroup.notes.push(note);
+    this.currentGroup.midinotesOn.push(note.midinote); 
     this.currentGroup.lastTime = note.time;
     return this.currentGroup;
   }
   private closeGroups(time:number) {
     if (!this.currentGroup)
+      return;
+    if (this.projectionParameters.filterParameters.useNoteOff && this.currentGroup.midinotesOn.length>0)
       return;
     if (this.currentGroup.lastTime+this.projectionParameters.filterParameters.streamGap < time) {
       this.currentGroup.closed = true;

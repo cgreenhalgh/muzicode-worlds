@@ -4,9 +4,12 @@ import { Note } from './note';
 
 describe('Note grouper', () => {
   let grouper : NoteGrouper;
-  let parameters = new ProjectionParameters();
+  let parameters : ProjectionParameters;
 
-  beforeEach( () => { grouper = new NoteGrouper(parameters); } );
+  beforeEach( () => { 
+    parameters = new ProjectionParameters();
+    grouper = new NoteGrouper(parameters); 
+  });
 
   it('true should be true', () => {
     expect(true).toBe(true);
@@ -31,5 +34,21 @@ describe('Note grouper', () => {
     let ng = grouper.addNote(note);
     let cgs = grouper.getClosedGroups(2.5);
     expect(cgs.length).toBe(0);
+  });
+  it ('should not close a group with useNoteOff while note is on', () => {
+    parameters.filterParameters.useNoteOff = true;
+    let note = new Note(60, 127, 1);
+    let ng = grouper.addNote(note);
+    let cgs = grouper.getClosedGroups(3.5);
+    expect(cgs.length).toBe(0);
+  });
+  it ('should close a group with useNoteOff after note is off', () => {
+    parameters.filterParameters.useNoteOff = true;
+    let note = new Note(60, 127, 1);
+    grouper.addNote(note);
+    let note2 = new Note(60, 0, 3);
+    grouper.addNote(note2);
+    let cgs = grouper.getClosedGroups(5.5);
+    expect(cgs.length).toBe(1);
   });
 });
