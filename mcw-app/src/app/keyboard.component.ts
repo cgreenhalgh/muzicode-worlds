@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Inject, 
-         OnInit, Output, ViewChild } from '@angular/core';
+         OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { SynthService } from './synth.service';
 import { Note, midi2freq } from './note';
 
@@ -29,7 +29,7 @@ let BLACK_KEY_HEIGHT = 0.66;
   templateUrl: './keyboard.component.html',
   styleUrls: ['./keyboard.component.css']
 })
-export class KeyboardComponent implements OnInit {
+export class KeyboardComponent implements OnInit, OnDestroy {
   @ViewChild('keyboardCanvas') canvasRef: ElementRef;
   @ViewChild('keyboardDiv') divRef: ElementRef;
   @Output() note: EventEmitter<Note> = new EventEmitter();
@@ -155,5 +155,13 @@ export class KeyboardComponent implements OnInit {
       }
     }
     this.redraw();
+  }
+  ngOnDestroy() {
+    for (let key of this.keys) {
+      if (key.active) {
+        this.synth.noteOff(midi2freq(key.midinote));
+        key.active = false;
+      }
+    }
   }
 }

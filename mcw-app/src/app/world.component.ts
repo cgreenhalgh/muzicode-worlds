@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, OnDestroy, 
          ViewChild, ElementRef, Inject, HostListener } from '@angular/core';
 import { Note } from './note';
-import { Sprite } from './sprite';
+import { Sprite, SpriteContext } from './sprite';
 
 @Component({
   selector: 'world',
@@ -11,6 +11,7 @@ import { Sprite } from './sprite';
 export class WorldComponent implements AfterViewInit, OnDestroy {
   @ViewChild('worldCanvas') canvasRef: ElementRef;
   @ViewChild('worldDiv') divRef: ElementRef;
+  private context:SpriteContext = new SpriteContext();
   private sprites:Sprite[] = [];
   private rafid:number;
   constructor() {
@@ -31,25 +32,27 @@ export class WorldComponent implements AfterViewInit, OnDestroy {
     //console.log('resize world '+width+'x'+height);
     this.canvasRef.nativeElement.width = width;
     this.canvasRef.nativeElement.height = height;
+    let size = Math.min(width, height);
+    this.context.width = size;
+    this.context.height = size;
+    this.context.xOffset = (width-size)/2;
+    this.context.yOffset = (height-size)/2;
+    let ctx: CanvasRenderingContext2D =
+      this.canvasRef.nativeElement.getContext('2d');
+    this.context.ctx = ctx;
   }
   redraw() {
     this.rafid = requestAnimationFrame(()=> {
       this.redraw()
     });
-
-    let width = this.canvasRef.nativeElement.width;
-    let height = this.canvasRef.nativeElement.height;
-    let ctx: CanvasRenderingContext2D =
-      this.canvasRef.nativeElement.getContext('2d');
-    let size = Math.min(width, height);
-    //console.log('redraw world '+width+'x'+height+' -> '+size);
-    ctx.fillStyle = '#700000';
-    ctx.fillRect((width-size)/2, (height-size)/2, size, size);
+    this.context.now = (new Date()).getTime()*0.001;
+    this.context.ctx.fillStyle = '#700000';
+    this.context.ctx.fillRect(this.context.xOffset, this.context.yOffset, this.context.width, this.context.height);
     this.sprites.sort((a,b) => { return a.zIndex - b.zIndex });
-    let now = (new Date()).getTime()*0.001;
     for (let sprite of this.sprites) {
-      sprite.draw(ctx, (width-size)/2, (height-size)/2, size, size, now);
+      sprite.draw(this.context);
     }
+    this.context.newNotes = [];
   }
   ngOnDestroy() {
     if (this.rafid)
@@ -57,5 +60,16 @@ export class WorldComponent implements AfterViewInit, OnDestroy {
   }
   OnNote(note:Note) {
     console.log('Note '+note.note+' vel '+note.velocity);
+    this.context.newNotes.push(note);
+    for (let i=0; i<this.context.activeNotes.length; i++) {
+      let n = this.context.activeNotes[i];
+      if (note.midinote == n.midinote) {
+        this.context.activeNotes.splice(i,1);
+        i--;
+      }
+    }
+    if (!note.off) {
+      this.context.activeNotes.push(note);
+    }
   }
 }
