@@ -1,0 +1,14 @@
+#keyboardDiv {
+	position: fixed;
+	width: 100%;
+	height: 30%;
+	top: 70%;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+}
+#keyboardCanvas {
+	width: 100%;
+	height: 100%;
+}
+

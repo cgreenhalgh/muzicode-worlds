@@ -1,3 +1,8 @@
-<div>Keyboard!</div>
-<canvas #keyboardCanvas width="500" height="500">
-</canvas>
+<div id="keyboardDiv" #keyboardDiv>
+	<canvas id="keyboardCanvas" #keyboardCanvas 
+                (touchstart)="onTouchStart($event)"
+		(touchend)="onTouchEnd($event)"
+		(touchcancel)="onTouchCancel($event)"
+		(touchmove)="onTouchMove($event)">
+	</canvas>
+</div>

@@ -28,12 +28,14 @@ class NPlay {
     else
       volume = 0.4;
     this.vca.gain.cancelScheduledValues(this.audioContext.currentTime);
+    this.vca.gain.setValueAtTime(this.vca.gain.value, this.audioContext.currentTime);
     this.vca.gain.linearRampToValueAtTime(volume,this.audioContext.currentTime+0.05);
-    this.vca.gain.linearRampToValueAtTime(volume*0.6,this.audioContext.currentTime+0.02);
+    this.vca.gain.linearRampToValueAtTime(volume*0.6,this.audioContext.currentTime+0.2);
   }
   off() {
     this.vca.gain.cancelScheduledValues(this.audioContext.currentTime);
-    this.vca.gain.linearRampToValueAtTime(0,this.audioContext.currentTime+0.03);
+    this.vca.gain.setValueAtTime(this.vca.gain.value, this.audioContext.currentTime);
+    this.vca.gain.linearRampToValueAtTime(0,this.audioContext.currentTime+0.05);
   }
 }
 
