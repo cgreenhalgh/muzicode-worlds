@@ -3,8 +3,8 @@ export function midi2freq(midinote) {
 }
 
 export function freq2midi(freq) {
-  let logfreq = Math.log2( freq / 261.6 );
-  return (logfreq - Math.floor(logfreq))*12 + 60;
+  // note 60 is middle C, C4, freq. is nominally 261.6Hz
+  return Math.log2( freq / 261.6 )*12 + 60;
 }
 
 let NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
