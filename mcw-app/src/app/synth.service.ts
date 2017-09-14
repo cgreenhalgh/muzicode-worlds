@@ -19,7 +19,7 @@ class NPlay {
     this.vco.connect(this.vca);
     this.vco.start(audioContext.currentTime);
     this.vca.connect(audioContext.destination);
-    console.log('noteOn new osc '+freq);
+    //console.log('noteOn new osc '+freq);
   }
   on(velocity:number) {
     var volume = 0.3;
@@ -56,7 +56,7 @@ export class SynthService {
 
   }
   noteOn(freq:number, velocity:number) {
-    console.log('noteOn('+freq+','+velocity);
+    //console.log('synth.noteOn('+freq+','+velocity+')');
     var nplay = this.notes.find((n) => Math.abs(freq-n.freq)<NOT_MUCH); 
     if (!nplay) {
       nplay = new NPlay(this.audioContext, freq);
@@ -67,7 +67,7 @@ export class SynthService {
     nplay.on(velocity);
   }
   noteOff(freq:number) {
-    console.log('noteOff('+freq+')');
+    //console.log('synth.noteOff('+freq+')');
     var nplay = this.notes.find((n) => Math.abs(freq-n.freq)<NOT_MUCH); 
     if (!!nplay) {
       nplay.off();

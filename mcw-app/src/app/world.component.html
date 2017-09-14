@@ -1,7 +1,5 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div class="container">
-  <h1>
-    World...
-  </h1>
-  <keyboard></keyboard>
+<div #worldDiv id="worldDiv">
+  <canvas #worldCanvas id="worldCanvas">
+  </canvas>
 </div>
+<keyboard (note)="OnNote($event)"></keyboard>

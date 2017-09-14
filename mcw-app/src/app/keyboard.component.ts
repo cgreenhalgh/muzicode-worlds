@@ -1,5 +1,7 @@
-import { Component, OnInit, ViewChild, ElementRef, Inject, HostListener } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Inject, 
+         OnInit, Output, ViewChild } from '@angular/core';
 import { SynthService } from './synth.service';
+import { Note, midi2freq } from './note';
 
 // C,C#,D,D#,E,F,F#,G,G#,A,A#,B
 let NOTEX = [0,0.5,1,1.5,2,3,3.5,4,4.5,5,5.5,6,7];
@@ -22,10 +24,6 @@ let HIGHEST_MIDINOTE = 72;
 let BLACK_KEY_WIDTH = 0.5;
 let BLACK_KEY_HEIGHT = 0.66;
 
-function midi2freq(midinote) {
-  return 261.6*Math.pow(2, (midinote-60)/12.0);
-}
-
 @Component({
   selector: 'keyboard',
   templateUrl: './keyboard.component.html',
@@ -34,6 +32,7 @@ function midi2freq(midinote) {
 export class KeyboardComponent implements OnInit {
   @ViewChild('keyboardCanvas') canvasRef: ElementRef;
   @ViewChild('keyboardDiv') divRef: ElementRef;
+  @Output() note: EventEmitter<Note> = new EventEmitter();
   keys:Key[] = [];
   private minXOffset:number;
   private maxXOffset:number;
@@ -45,12 +44,12 @@ export class KeyboardComponent implements OnInit {
     this.maxXOffset = this.keys[this.keys.length-1].xOffset;
   }
   @HostListener('window:resize', ['$event.target']) onResize() { 
-    console.log('window:resize');
+    //console.log('window:resize');
     this.resize();
     this.redraw();
   }
   ngOnInit() {
-    console.log('keyboard init');
+    //console.log('keyboard init');
     //this.synth.noteOn(1000,100);
     this.resize();
     this.redraw();
@@ -58,12 +57,12 @@ export class KeyboardComponent implements OnInit {
   resize() {
     let width = this.divRef.nativeElement.clientWidth;
     let height = this.divRef.nativeElement.clientHeight;
-    console.log('redraw '+width+'x'+height);
+    //console.log('resize keyboard '+width+'x'+height);
     this.canvasRef.nativeElement.width = width;
     this.canvasRef.nativeElement.height = height;
   }
   redraw() {
-    console.log('redraw');
+    //console.log('redraw keyboard');
     let width = this.canvasRef.nativeElement.width;
     let height = this.canvasRef.nativeElement.height;
     let ctx: CanvasRenderingContext2D =
@@ -93,22 +92,22 @@ export class KeyboardComponent implements OnInit {
   }
   onTouchStart($event) {
     $event.preventDefault();
-    console.log('touchstart '+$event.changedTouches.length+'/'+$event.targetTouches.length);
+    //console.log('touchstart '+$event.changedTouches.length+'/'+$event.targetTouches.length);
     this.updateKeys($event);
   }
   onTouchEnd($event) {
     $event.preventDefault();
-    console.log('touchend'+$event.changedTouches.length+'/'+$event.targetTouches.length);
+    //console.log('touchend'+$event.changedTouches.length+'/'+$event.targetTouches.length);
     this.updateKeys($event);
   }
   onTouchCancel($event) {
     $event.preventDefault();
-    console.log('touchcancel'+$event.changedTouches.length+'/'+$event.targetTouches.length);
+    //console.log('touchcancel'+$event.changedTouches.length+'/'+$event.targetTouches.length);
     this.updateKeys($event);
   }
   onTouchMove($event) {
     $event.preventDefault();
-    console.log('touchmove'+$event.changedTouches.length+'/'+$event.targetTouches.length);
+    //console.log('touchmove'+$event.changedTouches.length+'/'+$event.targetTouches.length);
     this.updateKeys($event);
   }
   updateKeys($event) {
@@ -123,7 +122,7 @@ export class KeyboardComponent implements OnInit {
       let touch = $event.targetTouches.item(i);
       let x = touch.clientX - rect.left;
       let y = touch.clientY - rect.top;
-      console.log('touch at '+x+','+y);
+      //console.log('touch at '+x+','+y);
       let xOffset = x/keywidth+this.minXOffset;
       if (x<0 || y<0 || x>=width || y>=height)
         continue;
@@ -144,11 +143,13 @@ export class KeyboardComponent implements OnInit {
     }
     for (let key of this.keys) {
       if (key.pressed && !key.active) {
-        console.log('press '+key.midinote);
+        //console.log('press '+key.midinote);
+        this.note.emit(new Note(key.midinote, 127));
         key.active = true;
         this.synth.noteOn(midi2freq(key.midinote), 127);
       } else if (!key.pressed && key.active) {
-        console.log('release '+key.midinote);
+        //console.log('release '+key.midinote);
+        this.note.emit(new Note(key.midinote, 0));
         key.active = false;
         this.synth.noteOff(midi2freq(key.midinote));
       }
