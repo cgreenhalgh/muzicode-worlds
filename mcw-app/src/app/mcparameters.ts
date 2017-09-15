@@ -12,3 +12,7 @@ export class ProjectionParameters {
 }
 
 // InexactParameters
+
+export class Context {
+	public tempo:number = 60; // BPM
+}

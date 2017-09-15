@@ -30,3 +30,7 @@ export class Note {
   }
 }
 
+export interface PitchOrDelay {
+	readonly midinote?:number;
+	readonly beats?:number;
+}
