@@ -1,4 +1,4 @@
-import { CodeParser, CodeNodeType, CodeParserState } from './mccode';
+import { CodeParser, CodeNodeType, CodeParserState, parserNodeToString } from './mccode';
 
 describe('CodeParser class', function() {
 	it('should parse C as a note', function() {
@@ -161,4 +161,77 @@ describe('CodeParser class', function() {
       }
     });
   });
+	it('should parse and normalise C#,(C#,C#) as a sequence of three notes', function() {
+		var parser = new CodeParser();
+		// jasmine.objectContaining()
+		expect(parser.normalise(parser.parse('C#,(C#,C#)').node)).toEqual({
+			// Left or right associative?!
+					type: CodeNodeType.SEQUENCE,
+					children: 
+						[
+						 { type: CodeNodeType.NOTE, midinote: 61 },
+						 { type: CodeNodeType.NOTE, midinote: 61 },
+						 { type: CodeNodeType.NOTE, midinote: 61 }
+						 ]
+		});
+	});
+	it('should parse and normalise [C-D] as a note range', function() {
+			var parser = new CodeParser();
+			// jasmine.objectContaining()
+			expect(parser.normalise(parser.parse('[C-D]').node)).toEqual({
+				// Left or right associative?!
+				type: CodeNodeType.NOTE_RANGE,
+				minMidinote: 60,
+				maxMidinote: 62
+			});
+	});
+	// 17
+	it('should parse and normalise /1,/1 as a /2', function() {
+			var parser = new CodeParser();
+			// jasmine.objectContaining()
+			expect(parser.normalise(parser.parse('/1,/1').node)).toEqual({
+				// Left or right associative?!
+				type: CodeNodeType.DELAY,
+				beats: 2
+			});
+	});
+	it('should parse and print C as C4', function() {
+			var parser = new CodeParser();
+			// jasmine.objectContaining()
+			expect(parserNodeToString(parser.normalise(parser.parse('C').node))).toEqual('C4');
+	});
+	it('should parse and print C3 as C3', function() {
+			var parser = new CodeParser();
+			// jasmine.objectContaining()
+			expect(parserNodeToString(parser.normalise(parser.parse('C3').node))).toEqual('C3');
+	});
+	it('should parse and print C,D|E as C4,D4|E4', function() {
+			var parser = new CodeParser();
+			// jasmine.objectContaining()
+			expect(parserNodeToString(parser.normalise(parser.parse('C,D|E').node))).toEqual('C4,D4|E4');
+	});
+	it('should parse and print (C,D) (C4,D4)', function() {
+			var parser = new CodeParser();
+			// jasmine.objectContaining()
+			expect(parserNodeToString(parser.normalise(parser.parse('(C,D)').node))).toEqual('C4,D4');
+	});
+	it('should parse and print /0.5 as /0.5', function() {
+			var parser = new CodeParser();
+			// jasmine.objectContaining()
+			expect(parserNodeToString(parser.normalise(parser.parse('/0.5').node))).toEqual('/0.5');
+	});
+	it('should parse and print (C?,D*|E)+ as (C4?,D4*|E4)+', function() {
+			var parser = new CodeParser();
+			// jasmine.objectContaining()
+			expect(parserNodeToString(parser.normalise(parser.parse('(C?,D*|E)+').node))).toEqual('(C4?,D4*|E4)+');
+	});
+	it('should normalise (C4,/0.5,D4) as (C4,/0.5,D4)', function() {
+			var parser = new CodeParser();
+			// jasmine.objectContaining()
+			var node = parser.parse('(C4,/0.5,D4)').node;
+			console.log('node: '+JSON.stringify( node ));
+			var norm = parser.normalise(node);
+			console.log('norm: '+JSON.stringify( norm ));
+			expect(parserNodeToString(norm)).toEqual('C4,/0.5,D4');
+	});
 });

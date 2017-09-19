@@ -5,12 +5,16 @@ export interface ParserNode {
   accidental?: string;
   octave?: number;
   beats?:number;
-  minNote?:number;
-  maxNote?:number;
+  minNote?:ParserNode;
+  maxNote?:ParserNode;
   minBeats?:number;
   maxBeats?:number;
   minRepeat?:number;
   maxRepeat?:number;
+  // normalised
+  midinote?:number;
+  minMidinote?:number;
+  maxMidinote?:number;
 }
 
 export function parse(text:string): ParserNode;
