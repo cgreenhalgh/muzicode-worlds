@@ -15,6 +15,8 @@ export interface ParserNode {
   midinote?:number;
   minMidinote?:number;
   maxMidinote?:number;
+  // matched
+  id?: number;
 }
 
 export function parse(text:string): ParserNode;
