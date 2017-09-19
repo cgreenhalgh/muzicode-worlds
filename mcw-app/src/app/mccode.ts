@@ -1,38 +1,19 @@
-export enum CodeTokenType {
-	FIXED_TEXT = 1,
-	NODE,
-	NOTE_NAME,
-	NOTE_ACCIDENTAL,
-	NUMBER
-}
-export interface CodeToken {
-	type:CodeTokenType;
-	text?:string;
-	number?:number;
-//	constructor(type:CodeTokenType) {
-//		this.type = type;
-//	}
-}
+import { ParserNode, parse } from './codeuiparser';
+
+// NB sync with pegjs parser values!
 export enum CodeNodeType {
-	NOTE = 1,
-	DELAY,
-	GROUP,
-	SEQUENCE,
-	CHOICE,
-	REPEAT,
-	REPEAT_0_OR_MORE,
-	REPEAT_1_OR_MORE,
-	REPEAT_0_OR_1,
-	NOTE_RANGE,
-	DELAY_RANGE,
-	WILDCARD
-}
-export interface CodeNode {
-	type:CodeNodeType;
-	children?:CodeNode[];
-	name?:string;
-	midinote?:number;
-	beats?:number;
+  NOTE = 1,
+  DELAY,
+  GROUP,
+  SEQUENCE,
+  CHOICE,
+  REPEAT,
+  REPEAT_0_OR_MORE,
+  REPEAT_1_OR_MORE,
+  REPEAT_0_OR_1,
+  NOTE_RANGE,
+  DELAY_RANGE,
+  WILDCARD
 }
 
 export enum CodeParserState {
@@ -42,13 +23,42 @@ export enum CodeParserState {
 }
 export interface ParseResult {
 	state:CodeParserState;
-	node?:CodeNode;
+	node?:ParserNode;
+  location?:number;
+  message?:string;
 }
 
 
 export class CodeParser {
 	constructor() {}
-	parse(text): ParseResult {
-		return {state: CodeParserState.ERROR};
-	}
+	parse(text:string): ParseResult {
+    try {
+      var res = parse(text);
+      return {
+        state: CodeParserState.OK,
+        node: this.stripNulls(res)
+      };
+    }
+    catch (err) {
+      console.log("Error parsing "+text+(err.location ? ' at '+JSON.stringify(err.location.start) : ''), err);
+      console.log(err);
+      return {
+        state: CodeParserState.ERROR,
+        location: (err.location ? err.location.start.offset : undefined),
+        message: err.message
+      };
+    }
+  }
+  stripNulls(obj:ParserNode): ParserNode {
+    for (var key in obj) {
+      if (obj[key]===null)
+        delete obj[key];
+    }
+    if (obj.children!==undefined) {
+      for (var ci in obj.children) {
+        this.stripNulls(obj.children[ci]);
+      }
+    }
+    return obj;
+  }
 }
