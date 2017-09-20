@@ -2,6 +2,7 @@ import { Component, AfterViewInit, OnDestroy,
          ViewChild, ElementRef, Inject, HostListener } from '@angular/core';
 import { Note } from './note';
 import { Sprite, SpriteContext } from './sprite';
+import { MuzicodeEngine } from './mc.library';
 
 @Component({
   selector: 'world',
@@ -14,8 +15,11 @@ export class WorldComponent implements AfterViewInit, OnDestroy {
   private context:SpriteContext = new SpriteContext();
   private sprites:Sprite[] = [];
   private rafid:number;
+  private mcengine = new MuzicodeEngine();
+  
   constructor() {
     this.sprites.push(new Sprite(0.5 ,0.5));
+    this.mcengine.addCodeMatcher('.*,A4,B4,G4,G4,D4');
   }
   @HostListener('window:resize', ['$event.target']) onResize() { 
     //console.log('window:resize');
@@ -71,5 +75,6 @@ export class WorldComponent implements AfterViewInit, OnDestroy {
     if (!note.off) {
       this.context.activeNotes.push(note);
     }
+    this.mcengine.addNote(note);
   }
 }

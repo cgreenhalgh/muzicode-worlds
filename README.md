@@ -33,5 +33,6 @@ cd /root/work/
 cd mcw-app
 npm install --no-bin-links
 ng serve --host=0.0.0.0
+ng build --bh /1/mcworlds/
 ```
 
