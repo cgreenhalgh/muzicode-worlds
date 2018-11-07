@@ -9,6 +9,15 @@ RUN npm install -g @angular/cli
 
 #VOLUME /root/work
 
+WORKDIR /root
+
+COPY package.json package-lock.json ./
+RUN npm install
+
+COPY tsconfig.json tslint.json angular.json .editorconfig ./
+COPY e2e e2e
+COPY src src
+
 EXPOSE 4200
 # karma testing
 EXPOSE 9876
